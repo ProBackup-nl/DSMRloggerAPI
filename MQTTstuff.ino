@@ -272,11 +272,14 @@ void sendMQTTData()
 //===========================================================================================
 void sendMQTTData(const String item, const String json)
 {
+#ifdef USE_MQTT
   sendMQTTData(item.c_str(), json.c_str());
+#endif
 } 
 
 void sendMQTTData(const char* item, const char *json) 
 {
+#ifdef USE_MQTT
 /*  
 * The maximum message size, including header, is 128 bytes by default. 
 * This is configurable via MQTT_MAX_PACKET_SIZE in PubSubClient.h.
@@ -295,22 +298,26 @@ void sendMQTTData(const char* item, const char *json)
   DebugTf("Sending MQTT: TopicId [%s] Message [%s]\r\n", topic, json);
   if (!MQTTclient.publish(topic, json, true)) DebugTln("MQTT publish failed.");
   delay(0);
+#endif
 } // sendMQTTData()
 
 //===========================================================================================
 void sendMQTT(const char* topic, const char *json, const int8_t len) 
 {
+#ifdef USE_MQTT
   if (!MQTTclient.connected() || !isValidIP(MQTTbrokerIP)) return;
   // DebugTf("Sending data to MQTT server [%s]:[%d] ", settingMQTTbroker.c_str(), settingMQTTbrokerPort);  
   DebugTf("Sending MQTT: TopicId [%s] Message [%s]\r\n", topic, json);
   if (MQTTclient.getBufferSize() < len) MQTTclient.setBufferSize(len); //resize buffer when needed
   if (!MQTTclient.publish(topic, json, true)) DebugTln("MQTT publish failed."); 
   delay(0);
+#endif
 } // sendMQTTData()
 
 //===========================================================================================
 bool splitString(String sIn, char del, String& cKey, String& cVal)
 {
+#ifdef USE_MQTT
   sIn.trim();                                 //trim spaces
   cKey=""; cVal="";
   if (sIn.indexOf("//")==0) return false;     //comment, skip split
@@ -320,6 +327,7 @@ bool splitString(String sIn, char del, String& cKey, String& cVal)
   cKey = sIn.substring(0,pos); cKey.trim();   //before, and trim spaces
   cVal = sIn.substring(pos+1); cVal.trim();   //after,and trim spaces
   return true;
+#endif
 }
 
 //===========================================================================================
@@ -336,7 +344,7 @@ bool splitString(String sIn, char del, String& cKey, String& cVal)
 */
 void doAutoConfigure()
 {
-
+#ifdef USE_MQTT
   const char* cfgFilename = "/mqttha.cfg";
   String sTopic="";
   String sMsg="";
@@ -362,6 +370,7 @@ void doAutoConfigure()
       fh.close();  
     } 
   } 
+#endif
 }
 
 
